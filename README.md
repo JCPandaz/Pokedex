@@ -1,2 +1,2 @@
 # FortniteStats
-WOP project, displaying fortnite player stats 
+WOP project, trying to create the "Pokedex" a database containing the information of Pokemon. 
