@@ -1,0 +1,73 @@
+import pypokedex
+import PIL.Image, PIL.ImageTk
+import tkinter as tk
+import urllib3 
+from io import BytesIO
+
+window = tk.Tk()
+window.geometry("600x500")
+window.title("National Pokedex")
+window.config(padx=10, pady=10)
+
+title_label = tk.Label(window, text = "National Pokedex")
+title_label.config(font=("Rockwell", 50))
+title_label.pack(padx=10, pady=10)
+
+subtitle_label = tk.Label(window, text = "Created by: Joseph Casino")
+subtitle_label.config(font=("Rockwell", 15))
+subtitle_label.pack(padx=5, pady=5)
+
+pokemon_image = tk.Label(window)
+pokemon_image.pack(padx=5, pady=5)
+
+pokemon_information = tk.Label(window)
+pokemon_information.config(font=("Rockwell", 30))
+pokemon_information.pack(padx=10, pady=10)
+
+pokemon_types = tk.Label(window)
+pokemon_types.config(font=("Rockwell", 25))
+pokemon_types.pack(padx=10, pady=10)
+
+pokemon_weight_height = tk.Label(window)
+pokemon_weight_height.config(font=("Rockwell", 20))
+pokemon_weight_height.pack(padx=10, pady=10)
+
+
+pokemon_basestats = tk.Label(window)
+pokemon_basestats.config(font=("Rockwell", 15))
+pokemon_basestats.pack(padx=10, pady=10)
+
+
+def load_pokemon():
+    pokemon = pypokedex.get(name=text_id_name.get(1.0,"end-1c"))
+
+    http = urllib3.PoolManager()
+    response = http.request('GET', pokemon.sprites.front.get('default'))
+    image = PIL.Image.open(BytesIO(response.data))
+    resize_image = image.resize((400, 400))
+
+    img = PIL.ImageTk.PhotoImage(resize_image)
+    pokemon_image.config(image=img)
+    pokemon_image.image = img
+
+    pokemon_information.config(text=f"{pokemon.dex} - {pokemon.name}".title())
+    pokemon_types.config(text=" - ".join([t for t in pokemon.types]).title())
+    pokemon_weight_height.config(text=f"Weight: {pokemon.weight}00 g - Height: {pokemon.height}0 cm")
+    pokemon_basestats.config(text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense} - Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def} - Speed: {pokemon.base_stats.speed}")
+
+
+
+label_id_name = tk.Label(window, text="Enter Name or Pokedex #")
+label_id_name.config(font=("Rockwell", 20))
+label_id_name.pack(padx=10, pady=10)
+
+text_id_name = tk.Text(window, height =1)
+text_id_name.config(font=("Rockwell", 20))
+text_id_name.pack(padx=10, pady=10)
+
+btn_load = tk.Button(window, text="LOAD POKEMON", command =load_pokemon)
+btn_load.config(font=("Rockwell", 20))
+btn_load.pack(padx=10, pady=10)
+
+window.mainloop()
+
