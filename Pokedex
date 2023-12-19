@@ -5,26 +5,51 @@ from tkinter import *
 import urllib3 
 from io import BytesIO
 
+
+# Some comments from Hunter. 
+
+#The first thing you will see is a function called resize elements that is commented out. This is sort of the 
+# Start on how to make the window adjust to the resizing on windows. In line 55, al;so commented out it says "window.bind("<Configure>", resize_elements)". 
+# This says that when the windows action of resizing happens on the box, call the resize_elements function. Right now all it does is reduce the width by 2 for each element
+# when uncommented. you need the function and the call for the function to work. Pro tip highlighing a group of text and hitting ctrl  + / will uncomment it, I think
+    
+# The next thing is the load pokemon function, that I will explain in comments in the function
+
+
+
+
+# def resize_elements(event):
+#     # Resize and reposition elements
+#     my_canvas.config(width=event.width, height=event.height)
+
+#     # Reposition elements based on the new window size
+#     my_canvas.coords(title_text, event.width / 2, 50)
+#     my_canvas.coords(subtitle_text, event.width / 2, 100)
+#     my_canvas.coords(pokemon_info, event.width / 2, 150)
+#     my_canvas.coords(pokemon_image, event.width / 2, event.height / 2)
+#     my_canvas.coords(pokemon_types, event.width / 2, 575)
+#     my_canvas.coords(pokemon_weight_height, event.width / 2, 625)
+#     my_canvas.coords(pokemon_basestats, event.width / 2, 675)
+#     my_canvas.coords(Pokemon_window, event.width / 2, 800)
+#     my_canvas.coords(load_btn_window, event.width / 2, 900)
+
 window = tk.Tk()
 window.geometry("1000x1000")
-window.resizable(width=False, height=False)
+window.resizable(width=True, height=True)
+img_ref = None #this is to help with the image error
 
-# Add image file 
-bg = PhotoImage( file = "Pokemon Background.png") 
-  
-#Create Canvas
-my_canvas = Canvas(window, width=1000, height=1000, bd=0,highlightthickness=0)
+
+# Create Canvas
+my_canvas = Canvas(window, width=1000, height=1000, bd=0, highlightthickness=0)
 my_canvas.pack(fill="both", expand=True)
 
-#Set background
-my_canvas.create_image(0,0, image = bg, anchor="nw")
+# Set background
+bg = PhotoImage(file="Pokemon Background.png")
+my_canvas.create_image(0, 0, image=bg, anchor="nw")
 
-window.title("National Pokedex")
-window.config(padx=10, pady=10)
-
-#Add title and subtitle
-my_canvas.create_text(500, 50, text="National Pokedex", font=("Rockwell", 50), fill= "white")
-my_canvas.create_text(500, 100, text="Created by Joseph Casino", font=("Rockwell", 15), fill= "red")
+# Add title and subtitle
+title_text = my_canvas.create_text(500, 50, text="National Pokedex", font=("Rockwell", 50), fill="white")
+subtitle_text = my_canvas.create_text(500, 100, text="Created by Joseph Casino", font=("Rockwell", 15), fill="red")
 
 #Pokemon Information
 pokemon_info = my_canvas.create_text(500, 150, text=f" ", font=("Rockwell", 50), fill= "black")
@@ -33,23 +58,53 @@ pokemon_types = my_canvas.create_text(500, 575, text=f" ", font=("Rockwell", 25)
 pokemon_weight_height = my_canvas.create_text(500, 625, text=f" ", font=("Rockwell", 20), fill= "black")
 pokemon_basestats = my_canvas.create_text(500, 675, text=f" ", font=("Rockwell", 15), fill= "black")
 
+# window.bind("<Configure>", resize_elements)
 
 #getter function that retrieves Pokemon information
+
+#load pokemon v2, what are the changes?
 def load_pokemon():
-    pokemon = pypokedex.get(name=Pokemon_Entry.get())
+    try: #first a try command. If you have never used it before it goes like this, it will "try" what is in the try block, and if it fails or errors
+        #it will go to the except block. this is a great way to handle errors. 
 
-    http = urllib3.PoolManager()
-    response = http.request('GET', pokemon.sprites.front.get('default'))
-    image = PIL.Image.open(BytesIO(response.data))
-    resize_image = image.resize((300, 300))
+        pokemon = pypokedex.get(name=Pokemon_Entry.get())
+        http = urllib3.PoolManager()
+        response = http.request('GET', pokemon.sprites.front.get('default'))
 
-    img = PIL.ImageTk.PhotoImage(resize_image)
-    my_canvas.itemconfig(pokemon_image, image=img)
-    
-    my_canvas.itemconfig(pokemon_info, text=f"{pokemon.dex} - {pokemon.name}".title())
-    my_canvas.itemconfig(pokemon_types, text=" - ".join([t for t in pokemon.types]).title())
-    my_canvas.itemconfig(pokemon_weight_height, text=f"Weight: {pokemon.weight}00 g - Height: {pokemon.height}0 cm")
-    my_canvas.itemconfig(pokemon_basestats, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense} - Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def} - Speed: {pokemon.base_stats.speed}")
+        if response.status == 200:  #resonse 200 is the universal response code for yes it worked, so we are checking if the api returned correct, if it didnt, we are going to tell the user. The api could be down and not work, but we dont want the program to suffer for it.
+            image = PIL.Image.open(BytesIO(response.data))
+            resize_image = image.resize((300, 300))
+            img = PIL.ImageTk.PhotoImage(resize_image)
+
+            # I think the image you had was being garbage collected. What do I mean by that? The image exists in the load_pokemon function, and it sets the img to be displayed on the canvas. However, it is not a global variable. 
+            #tkinter functions basically as an infinite loop, hence the command to run it is .mainloop(). It is constantly checking for stuff, faster then we can percieve. Now back to the canvas. IMMEDIATLY after leaving the load pokemon
+            #function, the program knows what the image is, however in the next tkinter loop, it is not sure if the image is still the one you want, you set it in the function, but now after it is looping over and over and over, we just arent sure, do you still want it to be that?
+            # so my workaround is to create a global varibale, a variable the eniter program can see. This way, the image is saved to a place outside of the function, and the program always knows what the image is. That is why at the beginning I had to set img_ref to None. 
+            # hopfeully this makes sense, I can explain it more in person if you want, but it fixes the problem
+            global img_ref
+            img_ref = img
+
+            my_canvas.itemconfig(pokemon_image, image=img)
+            my_canvas.itemconfig(pokemon_info, text=f"{pokemon.dex} - {pokemon.name}".title())
+            my_canvas.itemconfig(pokemon_types, text=" - ".join([t for t in pokemon.types]).title())
+            my_canvas.itemconfig(pokemon_weight_height, text=f"Weight: {pokemon.weight}00 g - Height: {pokemon.height}0 cm")
+            my_canvas.itemconfig(pokemon_basestats, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense} - Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def} - Speed: {pokemon.base_stats.speed}")
+        else: #this is an else message to handle if the api isnt working, it will print to the console and say hey faioled to work, you can change the error message
+            # Handle unsuccessful response
+            my_canvas.itemconfig(pokemon_info, text="Failed to fetch image.")
+            print("Failed to fetch the image from the API")
+
+    except pypokedex.exceptions.PyPokedexHTTPError as e: #this is the error message that this api returns if it didnt find the pokemon it was looking for. it will disply this on the canvas, you can change if you like
+ 
+        error_message = "The requested Pokémon was not found!"
+        my_canvas.itemconfig(pokemon_info, text=error_message)
+        print(e)
+
+    except Exception as e: #this is a general error, this is if an error occurred and who on earth knows what it was, just tell the user an error occurred
+
+        my_canvas.itemconfig(pokemon_info, text="An error occurred.")
+        print(e)
+
 
 
 #Adds Message
