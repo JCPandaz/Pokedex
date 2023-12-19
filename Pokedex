@@ -1,73 +1,67 @@
 import pypokedex
 import PIL.Image, PIL.ImageTk
 import tkinter as tk
+from tkinter import *
 import urllib3 
 from io import BytesIO
 
 window = tk.Tk()
-window.geometry("600x500")
+window.geometry("1000x1000")
+window.resizable(width=False, height=False)
+
+# Add image file 
+bg = PhotoImage( file = "Pokemon Background.png") 
+  
+#Create Canvas
+my_canvas = Canvas(window, width=1000, height=1000, bd=0,highlightthickness=0)
+my_canvas.pack(fill="both", expand=True)
+
+#Set background
+my_canvas.create_image(0,0, image = bg, anchor="nw")
+
 window.title("National Pokedex")
 window.config(padx=10, pady=10)
 
-title_label = tk.Label(window, text = "National Pokedex")
-title_label.config(font=("Rockwell", 50))
-title_label.pack(padx=10, pady=10)
+#Add title and subtitle
+my_canvas.create_text(500, 50, text="National Pokedex", font=("Rockwell", 50), fill= "white")
+my_canvas.create_text(500, 100, text="Created by Joseph Casino", font=("Rockwell", 15), fill= "red")
 
-subtitle_label = tk.Label(window, text = "Created by: Joseph Casino")
-subtitle_label.config(font=("Rockwell", 15))
-subtitle_label.pack(padx=5, pady=5)
-
-pokemon_image = tk.Label(window)
-pokemon_image.pack(padx=5, pady=5)
-
-pokemon_information = tk.Label(window)
-pokemon_information.config(font=("Rockwell", 30))
-pokemon_information.pack(padx=10, pady=10)
-
-pokemon_types = tk.Label(window)
-pokemon_types.config(font=("Rockwell", 25))
-pokemon_types.pack(padx=10, pady=10)
-
-pokemon_weight_height = tk.Label(window)
-pokemon_weight_height.config(font=("Rockwell", 20))
-pokemon_weight_height.pack(padx=10, pady=10)
+#Pokemon Information
+pokemon_info = my_canvas.create_text(500, 150, text=f" ", font=("Rockwell", 50), fill= "black")
+pokemon_image = my_canvas.create_image(500,400)
+pokemon_types = my_canvas.create_text(500, 575, text=f" ", font=("Rockwell", 25), fill= "black")
+pokemon_weight_height = my_canvas.create_text(500, 625, text=f" ", font=("Rockwell", 20), fill= "black")
+pokemon_basestats = my_canvas.create_text(500, 675, text=f" ", font=("Rockwell", 15), fill= "black")
 
 
-pokemon_basestats = tk.Label(window)
-pokemon_basestats.config(font=("Rockwell", 15))
-pokemon_basestats.pack(padx=10, pady=10)
-
-
+#getter function that retrieves Pokemon information
 def load_pokemon():
-    pokemon = pypokedex.get(name=text_id_name.get(1.0,"end-1c"))
+    pokemon = pypokedex.get(name=Pokemon_Entry.get())
 
     http = urllib3.PoolManager()
     response = http.request('GET', pokemon.sprites.front.get('default'))
     image = PIL.Image.open(BytesIO(response.data))
-    resize_image = image.resize((400, 400))
+    resize_image = image.resize((300, 300))
 
     img = PIL.ImageTk.PhotoImage(resize_image)
-    pokemon_image.config(image=img)
-    pokemon_image.image = img
-
-    pokemon_information.config(text=f"{pokemon.dex} - {pokemon.name}".title())
-    pokemon_types.config(text=" - ".join([t for t in pokemon.types]).title())
-    pokemon_weight_height.config(text=f"Weight: {pokemon.weight}00 g - Height: {pokemon.height}0 cm")
-    pokemon_basestats.config(text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense} - Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def} - Speed: {pokemon.base_stats.speed}")
-
+    my_canvas.itemconfig(pokemon_image, image=img)
+    
+    my_canvas.itemconfig(pokemon_info, text=f"{pokemon.dex} - {pokemon.name}".title())
+    my_canvas.itemconfig(pokemon_types, text=" - ".join([t for t in pokemon.types]).title())
+    my_canvas.itemconfig(pokemon_weight_height, text=f"Weight: {pokemon.weight}00 g - Height: {pokemon.height}0 cm")
+    my_canvas.itemconfig(pokemon_basestats, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense} - Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def} - Speed: {pokemon.base_stats.speed}")
 
 
-label_id_name = tk.Label(window, text="Enter Name or Pokedex #")
-label_id_name.config(font=("Rockwell", 20))
-label_id_name.pack(padx=10, pady=10)
+#Adds Message
+my_canvas.create_text(500, 750, text="Enter Name or Pokedex #", font=("Rockwell", 20), fill= "black")
 
-text_id_name = tk.Text(window, height =1)
-text_id_name.config(font=("Rockwell", 20))
-text_id_name.pack(padx=10, pady=10)
+#Add Entry box
+Pokemon_Entry = Entry(window, font=("Rockwell", 24), width=15, fg="black", bd=2)
+Pokemon_window=my_canvas.create_window(500,800, window=Pokemon_Entry)
 
-btn_load = tk.Button(window, text="LOAD POKEMON", command =load_pokemon)
-btn_load.config(font=("Rockwell", 20))
-btn_load.pack(padx=10, pady=10)
+#Add Button
+Load_Button = Button(window, text= "LOAD POKEMON", font=("Rockwell", 20), width = 15, command =load_pokemon)
+load_btn_window = my_canvas.create_window(500,900, window=Load_Button)
+
 
 window.mainloop()
-
