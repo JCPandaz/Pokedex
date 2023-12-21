@@ -10,7 +10,7 @@ from io import BytesIO
 # This says that when the windows action of resizing happens on the box, call the resize_elements function. Right now all it does is reduce the width by 2 for each element
 # when uncommented. you need the function and the call for the function to work.
     
-
+'''
 # a subclass of Canvas for dealing with resizing of windows
 class ResizingCanvas(Canvas):
     def __init__(self,parent,**kwargs):
@@ -29,7 +29,7 @@ class ResizingCanvas(Canvas):
         self.config(width=self.width, height=self.height)
         # rescale all the objects tagged with the "all" tag
         self.scale("all",0,0,wscale,hscale)
-
+'''
 '''
 def resize_elements(event):
      # Resize and reposition elements
@@ -49,21 +49,21 @@ def resize_elements(event):
 
 window = tk.Tk()
 window.geometry("1000x1000")
-window.resizable(width=True, height=True)
+window.resizable(width=False, height=False)
 
 img_ref = None #this is to help with the image error
 
 # Create Canvas
-my_canvas = ResizingCanvas(window, width=1000, height=1000, bd=0, highlightthickness=0)
+my_canvas = Canvas(window, width=1000, height=1000, bd=0, highlightthickness=0)
 my_canvas.pack(fill="both", expand=True)
 
 # Set background
-bg = PhotoImage(file="Pokemon Background.png")
+bg = PhotoImage(file="images\Pokemon Background.png")
 c = my_canvas.create_image(0, 0, image=bg, anchor="nw")
 
 #Add title and subtitle
 title_text = my_canvas.create_text(500, 50, text="National Pokedex", font=("Rockwell", 50), fill="white")
-subtitle_text = my_canvas.create_text(500, 100, text="Created by Joseph Casino", font=("Rockwell", 15), fill="red")
+subtitle_text = my_canvas.create_text(500, 100, text="Created by JCPandaz", font=("Rockwell", 15), fill="red")
 
 #Pokemon Information
 pokemon_info = my_canvas.create_text(500, 150, text=f" ", font=("Rockwell", 50), fill= "black")
@@ -136,7 +136,7 @@ def resizer(event):
     my_canvas.config(width=event.width, height=event.height)
 '''
 #window.bind("<Configure>", resizer)
-my_canvas.addtag_all("all")
+#my_canvas.addtag_all("all")
 
 window.mainloop()
 
