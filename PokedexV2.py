@@ -7,7 +7,12 @@ from io import BytesIO
 from tkinter import *
 from PIL import Image, ImageTk
 
+#for pokemon, make a global list
+#if the pokemon is already displayed, prevent it from displaying again
+
 img_ref = None #this is to help with the image error
+global_image_list = [] # making an empty global image list
+shit = [] #dont like this
 
 class dexEntry(Toplevel):
 
@@ -21,15 +26,20 @@ class dexEntry(Toplevel):
         # Create Window Canvas
         my_canvas = Canvas(Pokemon, width=512, height=364, bd=0, highlightthickness=0)
         my_canvas.pack(fill="both", expand=True)
-            # Set Pokedex Entry background
+        
+        # Set Pokedex Entry background
         bg = PhotoImage(file="Pokedex Screen.png")
         image = Image.open("Pokedex Screen.png")
         resize_image = image.resize((512, 364))
         img = PIL.ImageTk.PhotoImage(resize_image)
         c = my_canvas.create_image(0, 0, image=img, anchor="nw")
-        global img_ref
-        img_ref = img
+        
+        def add_image_to_gshit(image):
+            global shit
+            shit.append(image)
 
+        add_image_to_gshit(img)
+        
         #Pokemon Information
         pokemon_info = my_canvas.create_text(345, 60, text=f" ", font=("Rockwell", 12), fill= "black")
         pokemon_image = my_canvas.create_image(200,15)
@@ -37,6 +47,10 @@ class dexEntry(Toplevel):
         pokemon_height = my_canvas.create_text(340, 185, text=f" ", font=("Rockwell", 12), fill= "black")
         pokemon_weight = my_canvas.create_text(340, 215, text=f" ", font=("Rockwell", 12), fill= "black")
         pokemon_basestats = my_canvas.create_text(256, 300, text=f" ", font=("Rockwell", 15), fill= "black")
+
+        def add_image_to_global_list(image):
+            global global_image_list
+            global_image_list.append(image)
 
         def load_pokemon(Pokemon_Entry):
             try: 
@@ -47,8 +61,10 @@ class dexEntry(Toplevel):
                     image = PIL.Image.open(BytesIO(response.data))
                     resize_image = image.resize((300, 300))
                     img = PIL.ImageTk.PhotoImage(resize_image)
-                    global img_ref
-                    img_ref = img
+                    
+                    # global img_ref1
+                    # img_ref1 = img
+                    add_image_to_global_list(img)
 
                     my_canvas.itemconfig(pokemon_image, image=img)
                     my_canvas.itemconfig(pokemon_info, text=f"{pokemon.dex} - {pokemon.name}".title())
@@ -72,7 +88,8 @@ class dexEntry(Toplevel):
                 my_canvas.itemconfig(pokemon_info, text="An error occurred.", font=("Rockwell", 20), fill= "red")
                 print(e)
 
-
+        load_pokemon(Pokemon_Entry)
+        
 Home = tk.Tk()
 Home.geometry("360x640")
 Home.resizable(width=False, height=False)

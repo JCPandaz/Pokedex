@@ -1,0 +1,11 @@
+import pypokedex
+import PIL.Image, PIL.ImageTk
+import tkinter as tk
+from tkinter import *
+import urllib3 
+from io import BytesIO
+from tkinter import *
+from PIL import Image, ImageTk
+
+Home.geometry("500x500")
+Home.mainloop()
