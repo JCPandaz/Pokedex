@@ -10,6 +10,7 @@ img_ref = None #this is to help with the image error
 global_image_list = [] # making an empty global image list
 background_list = [] #not optimized but a solution to the background
 
+#Dex Entry Window
 class dexEntry(Toplevel):
 
     def __init__(Pokemon, master = None):
@@ -37,7 +38,7 @@ class dexEntry(Toplevel):
         #Pokemon Information
         pokemon_info = my_canvas.create_text(375, 60, text=f" ", font=("Consolas", 12), fill= "black")
         pokemon_image = my_canvas.create_image(150,152)
-        pokemon_types = my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
+        pokemon_type = my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
         pokemon_height = my_canvas.create_text(395, 185, text=f" ", font=("Consolas", 12), fill= "black")
         pokemon_weight = my_canvas.create_text(395, 215, text=f" ", font=("Consolas", 12), fill= "black")
         pokemon_basestats1 = my_canvas.create_text(256, 280, text=f" ", font=("Consolas", 14), fill= "black", width=500)
@@ -61,20 +62,41 @@ class dexEntry(Toplevel):
                     resize_image = image.resize((200, 200))
                     img = PIL.ImageTk.PhotoImage(resize_image)
                     add_image_to_global_list(img)
-
-                    #One type example: ['grass']
-                    #Two Type Example: ['grass','poison']
-                    #function for changing the color of types
-                    #def TypeColoring():
-                        #if pokemon.types == ['grass']:
-                            #my_canvas.itemconfig(pokemon_types, fill= "green")
-                        #if pokemon.types == ['grass','poison']:
-
                     
+                    #function for displaying the Pokemon Type(s)
+                    def Type_Colors():
+                        #changing pokemon.types list of strings so that it is just words                        
+                        poke_types = f"{pokemon.types}"
+                        modified_list = poke_types.strip("[]").replace("'","").replace(", "," - ")
+
+                        #18 pokemon types
+                        primary_types = ["grass","poison","water","fire","normal","psychic","electric","fighting","bug",
+                                         "fairy","dragon","ice","steel","rock","flying","ground","ghost","dark"]
+                        # Color palette for each Pokemon type
+                        color_palette = {"grass": "green","poison": "purple","water": "blue", "fire": "red", "normal": "gray","psychic": "violet red", "electric": "yellow",
+                                         "fighting": "brown4", "bug": "yellow green", "fairy": "light pink", "dragon": "goldenrod", "ice": "cyan", "steel": "dim gray",
+                                         "rock": "tan2", "flying": "Skyblue1", "ground": "sienna4", "ghost": "purple4", "dark": "midnight blue"}
+                        #nested for loop, checking the type or dual-type of the pokemon, and assigning the text a color from the color pallette
+                        for type1 in primary_types:
+                            for type2 in primary_types:
+                                if f"{type1}" == f"{modified_list}":
+                                    primary_color = color_palette.get(type1)
+                                    my_canvas.itemconfig(pokemon_type, fill=primary_color)
+                                    my_canvas.itemconfig(pokemon_type, text=" - ".join([t for t in pokemon.types]).title())
+                                    return
+                                if f"{type1} - {type2}" == f"{modified_list}":
+                                    primary_color = color_palette.get(type1)
+                                    secondary_color = color_palette.get(type2)
+                                    pokemon_type1 = my_canvas.create_text(330, 95, text=f" ", font=("Consolas", 12))
+                                    my_canvas.itemconfig(pokemon_type1, text=f"{type1}".title(), fill=primary_color)
+                                    pokemon_type2 = my_canvas.create_text(420, 95, text=f" ", font=("Consolas", 12))
+                                    my_canvas.itemconfig(pokemon_type2, text=f"{type2}".title(), fill=secondary_color)
+                                    return
+                    
+                        
                     my_canvas.itemconfig(pokemon_image, image=img)
                     my_canvas.itemconfig(pokemon_info, text=f"No.{pokemon.dex} - {pokemon.name}".title())
-                    my_canvas.itemconfig(pokemon_types, text=" - ".join([t for t in pokemon.types]).title())
-                    #TypeColoring()
+                    Type_Colors()
                     my_canvas.itemconfig(pokemon_height, text=f"Height: {pokemon.height}0 cm")
                     my_canvas.itemconfig(pokemon_weight, text=f"Weight: {pokemon.weight}00 g")
                     my_canvas.itemconfig(pokemon_basestats1, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense}")
@@ -94,10 +116,10 @@ class dexEntry(Toplevel):
 
                 my_canvas.itemconfig(pokemon_info, text="MISSINGNO.")
                 my_canvas.itemconfig(pokemon_image, image=img)
-                my_canvas.itemconfig(pokemon_types, text="???? - ????")
+                my_canvas.itemconfig(pokemon_type, text="???? - ????")
                 my_canvas.itemconfig(pokemon_height, text="Height: ????")
                 my_canvas.itemconfig(pokemon_weight, text="Weight: ????")
-                my_canvas.itemconfig(error_message, text="The requested Pokemon was not found. Please try again.")
+                my_canvas.itemconfig(error_message, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
                 print(e)
 
             except Exception as e: #if an error occurred and who on earth knows what it was, just tell the user an error occurred
@@ -108,14 +130,16 @@ class dexEntry(Toplevel):
 
                 my_canvas.itemconfig(pokemon_info, text="MISSINGNO.")
                 my_canvas.itemconfig(pokemon_image, image=img)
-                my_canvas.itemconfig(pokemon_types, text="???? - ????")
+                my_canvas.itemconfig(pokemon_type, text="???? - ????")
                 my_canvas.itemconfig(pokemon_height, text="Height: ????")
                 my_canvas.itemconfig(pokemon_weight, text="Weight: ????")
-                my_canvas.itemconfig(error_message, text="An error occurred. Please Try Again.")
+                my_canvas.itemconfig(error_message, text="An error occurred. Please Try Again.", font= ("Consolas", 10))
                 print(e)
 
         load_pokemon(Pokemon_Entry)
-        
+
+
+#Home Screen
 Home = tk.Tk()
 Home.geometry("360x640")
 Home.resizable(width=False, height=False)
