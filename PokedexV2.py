@@ -35,19 +35,20 @@ class dexEntry(Toplevel):
         add_image_to_background_list(img)
         
         #Pokemon Information
-        pokemon_info = my_canvas.create_text(365, 60, text=f" ", font=("Rockwell", 12), fill= "black")
+        pokemon_info = my_canvas.create_text(375, 60, text=f" ", font=("Consolas", 12), fill= "black")
         pokemon_image = my_canvas.create_image(150,152)
-        pokemon_types = my_canvas.create_text(365, 95, text=f" ", font=("Rockwell", 12), fill= "black")
-        pokemon_height = my_canvas.create_text(395, 185, text=f" ", font=("Rockwell", 12), fill= "black")
-        pokemon_weight = my_canvas.create_text(395, 215, text=f" ", font=("Rockwell", 12), fill= "black")
-        pokemon_basestats1 = my_canvas.create_text(256, 275, text=f" ", font=("Rockwell", 15), fill= "black", width=400)
-        pokemon_basestats2 = my_canvas.create_text(256, 300, text=f" ", font=("Rockwell", 15), fill= "black", width=400)
-        pokemon_speed = my_canvas.create_text(256, 325, text=f" ", font=("Rockwell", 15), fill= "black", width=400)
-        error_message = my_canvas.create_text(256, 300, text=f" ", font=("Rockwell", 12), fill= "red")
+        pokemon_types = my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
+        pokemon_height = my_canvas.create_text(395, 185, text=f" ", font=("Consolas", 12), fill= "black")
+        pokemon_weight = my_canvas.create_text(395, 215, text=f" ", font=("Consolas", 12), fill= "black")
+        pokemon_basestats1 = my_canvas.create_text(256, 280, text=f" ", font=("Consolas", 14), fill= "black", width=500)
+        pokemon_basestats2 = my_canvas.create_text(256, 305, text=f" ", font=("Consolas", 14), fill= "black", width=500)
+        pokemon_speed = my_canvas.create_text(256, 330, text=f" ", font=("Consolas", 14), fill= "black", width=400)
+        error_message = my_canvas.create_text(256, 300, text=f" ", font=("Consolas", 12), fill= "red")
 
         def add_image_to_global_list(image):
             global global_image_list
             global_image_list.append(image)
+
 
         def load_pokemon(Pokemon_Entry):
             try: 
@@ -61,9 +62,19 @@ class dexEntry(Toplevel):
                     img = PIL.ImageTk.PhotoImage(resize_image)
                     add_image_to_global_list(img)
 
+                    #One type example: ['grass']
+                    #Two Type Example: ['grass','poison']
+                    #function for changing the color of types
+                    #def TypeColoring():
+                        #if pokemon.types == ['grass']:
+                            #my_canvas.itemconfig(pokemon_types, fill= "green")
+                        #if pokemon.types == ['grass','poison']:
+
+                    
                     my_canvas.itemconfig(pokemon_image, image=img)
                     my_canvas.itemconfig(pokemon_info, text=f"No.{pokemon.dex} - {pokemon.name}".title())
                     my_canvas.itemconfig(pokemon_types, text=" - ".join([t for t in pokemon.types]).title())
+                    #TypeColoring()
                     my_canvas.itemconfig(pokemon_height, text=f"Height: {pokemon.height}0 cm")
                     my_canvas.itemconfig(pokemon_weight, text=f"Weight: {pokemon.weight}00 g")
                     my_canvas.itemconfig(pokemon_basestats1, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense}")
@@ -121,14 +132,14 @@ img = PIL.ImageTk.PhotoImage(resize_image)
 c = my_canvas.create_image(0, 0, image=img, anchor="nw")
 
 #Add Texts
-title_text = my_canvas.create_text(180, 290, text="Python Pokedex", font=("Rockwell", 25), fill="black")
-subtitle_text = my_canvas.create_text(180, 320, text="Created by JCPandaz", font=("Rockwell", 12), fill="red")
-my_canvas.create_text(180, 420, text="Enter Name or Pokedex #", font=("Rockwell", 18), fill= "black")
+title_text = my_canvas.create_text(180, 290, text="Python Pokedex", font=("Consolas", 30), fill="black")
+subtitle_text = my_canvas.create_text(180, 320, text="Created by JCPandaz", font=("Consolas", 15), fill="red")
+my_canvas.create_text(180, 420, text="Enter Name or Pokedex #:", font=("Consolas", 15), fill= "black")
 #Add Entry box
-Pokemon_Entry = Entry(Home, font=("Rockwell", 24), width=15, fg="black", bd=2)
+Pokemon_Entry = Entry(Home, font=("Consolas", 24), width=15, fg="black", bd=2)
 Pokemon_window=my_canvas.create_window(180,460, window=Pokemon_Entry)
 #Add Button
-btn = Button(Home, text= "LOAD POKEMON", font=("Rockwell", 20), width = 18, command = dexEntry)
+btn = Button(Home, text= "LOAD POKEMON", font=("Consolas", 20), width = 18, command = dexEntry)
 load_btn_window = my_canvas.create_window(180,578, window=btn)
 
 Home.mainloop()
