@@ -24,6 +24,11 @@ Future ideas/functions to be implemented:
 
 -Add new entry box on home page where user can input a type, and a list of all the Pokemon with that type will appear
 
+-indicate if a Pokemon is legendary/mythical in the dex entry window
+
+-add a button that lets the user see the moveset list of the pokemon, along with the learning method
+
+
 
 12/18/2023 - Pokedex.py: My first attempt at a Pokedex (and my first python program ever)
 
