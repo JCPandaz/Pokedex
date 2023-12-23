@@ -10,6 +10,10 @@ img_ref = None #this is to help with the image error
 global_image_list = [] # making an empty global image list
 background_list = [] #not optimized but a solution to the background
 
+#initiallize direction of sprite
+global direction
+direction = "front"
+
 #Dex Entry Window
 class dexEntry(Toplevel):
 
@@ -38,7 +42,7 @@ class dexEntry(Toplevel):
 
         #Pokemon Information
         pokemon_info = my_canvas.create_text(375, 60, text=f" ", font=("Consolas", 12), fill= "black")
-        global pokemon_image
+        #global pokemon_image
         pokemon_image = my_canvas.create_image(150,152)
         pokemon_type = my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
         pokemon_height = my_canvas.create_text(395, 185, text=f" ", font=("Consolas", 12), fill= "black")
@@ -58,7 +62,8 @@ class dexEntry(Toplevel):
                 Pokemon.title(f"Pokedex Entry No.{pokemon.dex} - {pokemon.name}".title())
                 http = urllib3.PoolManager()
                 #get front sprite and display it
-                response = http.request('GET', pokemon.sprites.front.get('default'))
+                print(f"URL: {pokemon.sprites.front.get('default')}")
+                response = http.request('GET', pokemon.sprites.front.get('default'), preload_content=False)
                 if response.status == 200:
                     image = PIL.Image.open(BytesIO(response.data))
                     resize_image = image.resize((200, 200))
@@ -66,32 +71,33 @@ class dexEntry(Toplevel):
                     front_img = PIL.ImageTk.PhotoImage(resize_image)
                     add_image_to_global_list(front_img)
                     my_canvas.itemconfig(pokemon_image, image=front_img)
-                #get back sprite
-                response = http.request('GET', pokemon.sprites.back.get('default'))
-                if response.status == 200:
-                    image2 = PIL.Image.open(BytesIO(response.data))
-                    resize_image2 = image2.resize((200, 200))
-                    global back_img
-                    back_img = PIL.ImageTk.PhotoImage(resize_image2)
-                    add_image_to_global_list(back_img)
-                    
-                    #function for turn sprite button
-                    def switchsprite():
-                        global direction
-                        if direction == "front":
-                            my_canvas.itemconfig(pokemon_image, image=back_img)
-                            direction = "back"
-                            return
-                        if direction == "back":
-                            my_canvas.itemconfig(pokemon_image, image =front_img)
-                            direction = "front"
-                            return
-                        
-                    #switch sprite button and indicator
-                    global direction
-                    direction = "front"
-                    sprite_btn = Button(my_canvas, text= "TURN SPRITE", font=("Consolas", 8), width = 15, command=switchsprite)
-                    back_sprite_btn_window = my_canvas.create_window(66,50, window=sprite_btn)
+                    response.release_conn()  # Release the connection
+                #get back sprite (if there is one)
+                if pokemon.sprites.back.get('default'):
+                    response = http.request('GET', pokemon.sprites.back.get('default'), preload_content=False)
+                    if response.status == 200:
+                        image2 = PIL.Image.open(BytesIO(response.data))
+                        resize_image2 = image2.resize((200, 200))
+                        global back_img
+                        back_img = PIL.ImageTk.PhotoImage(resize_image2)
+                        add_image_to_global_list(back_img)
+                        response.release_conn()  # Release the connection
+
+                        #function for turn sprite button
+                        def switchsprite():
+                            global direction
+                            if direction == "front":
+                                my_canvas.itemconfig(pokemon_image, image=back_img)
+                                direction = "back"
+                                return
+                            if direction == "back":
+                                my_canvas.itemconfig(pokemon_image, image =front_img)
+                                direction = "front"
+                                return
+                            
+                        #switch sprite button
+                        sprite_btn = Button(my_canvas, text= "TURN SPRITE", font=("Consolas", 8), width = 15, command=switchsprite)
+                        back_sprite_btn_window = my_canvas.create_window(66,50, window=sprite_btn)
 
                     #function for displaying the Pokemon Type(s)
                     def Type_Colors():
