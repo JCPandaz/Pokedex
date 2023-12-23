@@ -3,9 +3,11 @@ WOP personal learning project, trying to create the "Pokedex", a database contai
 NEW!
 PokedexV2.py: 
 
-Program now displays different colored typings! Also works with dual-type pokemon.
+12/23/2023 - Added turn button that shows the back of the sprite!
 
-Program starts on a home screen (shaped like a Pokedex) where the user can search a Pokemon based on Name or Pokedex Number. 
+12/22/2023 - Program now displays different colored typings! Also works with dual-type pokemon.
+
+12/21/2023 - Completed initial program starts on a home screen (shaped like a Pokedex) where the user can search a Pokemon based on Name or Pokedex Number. 
 Pressing the button then opens up a new window titled "Pokedex Entry" which has the layout of a Pokedex Entry Screen similar to the game.
 This new window displays the sprite, pokedex number, name, type, height, weight, and base stats. 
 The user can keep searching Pokemon and have multiple windows open with different dex entries. 
@@ -20,12 +22,10 @@ Future ideas/functions to be implemented:
 
 -Add buttons to the dex entry window that show what typings are weak against or super effective to that pokemon
 
--Add a button that shows the back of the sprite
-
 -Add new entry box on home page where user can input a type, and a list of all the Pokemon with that type will appear
 
 
-Pokedex.py: My first attempt at a Pokedex (and my first python program ever)
+12/18/2023 - Pokedex.py: My first attempt at a Pokedex (and my first python program ever)
 
 Code uses an entry box that allows the user to search a Pokemon based on Name or Pokedex Number.
 When a Pokemon is searched, it will display the Pokedex Number, Name, Sprite, Type, Weight, Height, and Base Stats. 
