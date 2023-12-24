@@ -16,22 +16,22 @@ direction = "front"
 
 #Dex Entry Window
 class dexEntry(Toplevel):
-
-    def __init__(Pokemon, master = None):
+    
+    def __init__(self, master = None):
             
         super().__init__(master = master)
-        Pokemon.geometry("512x364")
-        Pokemon.resizable(width=False, height=False)
+        self.geometry("512x364")
+        self.resizable(width=False, height=False)
         
         # Create Window Canvas
-        my_canvas = Canvas(Pokemon, width=512, height=364, bd=0, highlightthickness=0)
-        my_canvas.pack(fill="both", expand=True)
+        self.my_canvas = Canvas(self, width=512, height=364, bd=0, highlightthickness=0)
+        self.my_canvas.pack(fill="both", expand=True)
         
         # Set Pokedex Entry background
         image = Image.open("images\Pokedex Screen.png")
         resize_image = image.resize((512, 364))
         img = PIL.ImageTk.PhotoImage(resize_image)
-        c = my_canvas.create_image(0, 0, image=img, anchor="nw")
+        c = self.my_canvas.create_image(0, 0, image=img, anchor="nw")
         
         def add_image_to_background_list(image):
             global background_list
@@ -41,15 +41,18 @@ class dexEntry(Toplevel):
         
 
         #Pokemon Information
-        pokemon_info = my_canvas.create_text(375, 60, text=f" ", font=("Consolas", 12), fill= "black")
-        pokemon_image = my_canvas.create_image(150,152)
-        pokemon_type = my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
-        pokemon_height = my_canvas.create_text(395, 185, text=f" ", font=("Consolas", 12), fill= "black")
-        pokemon_weight = my_canvas.create_text(395, 215, text=f" ", font=("Consolas", 12), fill= "black")
-        pokemon_basestats1 = my_canvas.create_text(256, 280, text=f" ", font=("Consolas", 14), fill= "black", width=500)
-        pokemon_basestats2 = my_canvas.create_text(256, 305, text=f" ", font=("Consolas", 14), fill= "black", width=500)
-        pokemon_speed = my_canvas.create_text(256, 330, text=f" ", font=("Consolas", 14), fill= "black", width=400)
-        error_message = my_canvas.create_text(256, 300, text=f" ", font=("Consolas", 12), fill= "red")
+        self.pokemon_info = self.my_canvas.create_text(375, 60, text=f" ", font=("Consolas", 12), fill= "black")
+        self.pokemon_image = self.my_canvas.create_image(150,152)
+        self.pokemon_type = self.my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
+        self.pokemon_height = self.my_canvas.create_text(395, 185, text=f" ", font=("Consolas", 12), fill= "black")
+        self.pokemon_weight = self.my_canvas.create_text(395, 215, text=f" ", font=("Consolas", 12), fill= "black")
+        self.pokemon_basestats1 = self.my_canvas.create_text(256, 280, text=f" ", font=("Consolas", 14), fill= "black", width=500)
+        self.pokemon_basestats2 = self.my_canvas.create_text(256, 305, text=f" ", font=("Consolas", 14), fill= "black", width=500)
+        self.pokemon_speed = self.my_canvas.create_text(256, 330, text=f" ", font=("Consolas", 14), fill= "black", width=400)
+        self.error_message = self.my_canvas.create_text(256, 300, text=f" ", font=("Consolas", 12), fill= "red")
+
+        self.front_img = None
+        self.back_img = None
 
         def add_image_to_global_list(image):
             global global_image_list
@@ -58,7 +61,7 @@ class dexEntry(Toplevel):
         def load_pokemon(Pokemon_Entry):
             try: 
                 pokemon = pypokedex.get(name=Pokemon_Entry.get())
-                Pokemon.title(f"Pokedex Entry No.{pokemon.dex} - {pokemon.name}".title())
+                self.title(f"Pokedex Entry No.{pokemon.dex} - {pokemon.name}".title())
                 http = urllib3.PoolManager()
                 #get front sprite and display it
                 response = http.request('GET', pokemon.sprites.front.get('default'), preload_content=False)
@@ -66,36 +69,36 @@ class dexEntry(Toplevel):
                     image = PIL.Image.open(BytesIO(response.data))
                     resize_image = image.resize((200, 200))
                     global  front_img
-                    front_img = PIL.ImageTk.PhotoImage(resize_image)
-                    add_image_to_global_list(front_img)
-                    my_canvas.itemconfig(pokemon_image, image=front_img)
+                    self.front_img = PIL.ImageTk.PhotoImage(resize_image)
+                    add_image_to_global_list(self.front_img)
+                    self.my_canvas.itemconfig(self.pokemon_image, image=self.front_img)
                     response.release_conn()  # Release the connection
-                #get back sprite (if there is one)
+                #get back sprite (if there is one) and implement turn sprite button
                     if pokemon.sprites.back.get('default'):
                         response = http.request('GET', pokemon.sprites.back.get('default'), preload_content=False)
                         if response.status == 200:
                             image2 = PIL.Image.open(BytesIO(response.data))
                             resize_image2 = image2.resize((200, 200))
                             global back_img
-                            back_img = PIL.ImageTk.PhotoImage(resize_image2)
-                            add_image_to_global_list(back_img)
+                            self.back_img = PIL.ImageTk.PhotoImage(resize_image2)
+                            add_image_to_global_list(self.back_img)
                             response.release_conn()  # Release the connection
 
                             #function for turn sprite button
                             def switchsprite():
                                 global direction
                                 if direction == "front":
-                                    my_canvas.itemconfig(pokemon_image, image=back_img)
+                                    self.my_canvas.itemconfig(self.pokemon_image, image=self.back_img)
                                     direction = "back"
                                     return
                                 if direction == "back":
-                                    my_canvas.itemconfig(pokemon_image, image =front_img)
+                                    self.my_canvas.itemconfig(self.pokemon_image, image =self.front_img)
                                     direction = "front"
                                     return
                             
-                            #switch sprite button
-                            sprite_btn = Button(my_canvas, text= "TURN SPRITE", font=("Consolas", 8), width = 15, command=switchsprite)
-                            back_sprite_btn_window = my_canvas.create_window(66,50, window=sprite_btn)
+                            #turn sprite button
+                            sprite_btn = Button(self.my_canvas, text= "TURN SPRITE", font=("Consolas", 8), width = 15, command=switchsprite)
+                            back_sprite_btn_window = self.my_canvas.create_window(66,50, window=sprite_btn)
 
                     #function for displaying the Pokemon Type(s)
                     def Type_Colors():
@@ -115,45 +118,56 @@ class dexEntry(Toplevel):
                             for type2 in primary_types:
                                 if f"{type1}" == f"{modified_list}":
                                     primary_color = color_palette.get(type1)
-                                    my_canvas.itemconfig(pokemon_type, fill=primary_color)
-                                    my_canvas.itemconfig(pokemon_type, text=" - ".join([t for t in pokemon.types]).title())
+                                    self.my_canvas.itemconfig(self.pokemon_type, fill=primary_color)
+                                    self.my_canvas.itemconfig(self.pokemon_type, text=" - ".join([t for t in pokemon.types]).title())
                                     return
                                 if f"{type1} - {type2}" == f"{modified_list}":
                                     primary_color = color_palette.get(type1)
                                     secondary_color = color_palette.get(type2)
-                                    pokemon_type1 = my_canvas.create_text(330, 95, text=f" ", font=("Consolas", 12))
-                                    my_canvas.itemconfig(pokemon_type1, text=f"{type1}".title(), fill=primary_color)
-                                    pokemon_type2 = my_canvas.create_text(420, 95, text=f" ", font=("Consolas", 12))
-                                    my_canvas.itemconfig(pokemon_type2, text=f"{type2}".title(), fill=secondary_color)
+                                    pokemon_type1 = self.my_canvas.create_text(330, 95, text=f" ", font=("Consolas", 12))
+                                    self.my_canvas.itemconfig(pokemon_type1, text=f"{type1}".title(), fill=primary_color)
+                                    pokemon_type2 = self.my_canvas.create_text(420, 95, text=f" ", font=("Consolas", 12))
+                                    self.my_canvas.itemconfig(pokemon_type2, text=f"{type2}".title(), fill=secondary_color)
                                     return
                     
                         
                     #my_canvas.itemconfig(pokemon_image, image=front_img)
-                    my_canvas.itemconfig(pokemon_info, text=f"No.{pokemon.dex} - {pokemon.name}".title())
+                    self.my_canvas.itemconfig(self.pokemon_info, text=f"No.{pokemon.dex} - {pokemon.name}".title())
                     Type_Colors()
-                    my_canvas.itemconfig(pokemon_height, text=f"Height: {pokemon.height}0 cm")
-                    my_canvas.itemconfig(pokemon_weight, text=f"Weight: {pokemon.weight}00 g")
-                    my_canvas.itemconfig(pokemon_basestats1, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense}")
-                    my_canvas.itemconfig(pokemon_basestats2, text=f"Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def}")
-                    my_canvas.itemconfig(pokemon_speed, text=f"Speed: {pokemon.base_stats.speed}")
+                    self.my_canvas.itemconfig(self.pokemon_height, text=f"Height: {pokemon.height}0 cm")
+                    self.my_canvas.itemconfig(self.pokemon_weight, text=f"Weight: {pokemon.weight}00 g")
+                    self.my_canvas.itemconfig(self.pokemon_basestats1, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense}")
+                    self.my_canvas.itemconfig(self.pokemon_basestats2, text=f"Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def}")
+                    self.my_canvas.itemconfig(self.pokemon_speed, text=f"Speed: {pokemon.base_stats.speed}")
                 else: 
                     # Handle unsuccessful response
-                    my_canvas.itemconfig(error_message, text="Failed to fetch Pokemon from API.")
+                    self.title("MISSINGNO.")
+                    image = PIL.Image.open("images\MissingNo.png")
+                    resize_image = image.resize((200, 200))
+                    missingno_img = PIL.ImageTk.PhotoImage(resize_image)
+                    add_image_to_global_list(img)
+
+                    self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
+                    self.my_canvas.itemconfig(self.pokemon_image, image=missingno_img)
+                    self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
+                    self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
+                    self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
+                    self.my_canvas.itemconfig(self.error_message, text="Failed to fetch Pokemon from API.")
                     print("Failed to fetch the load Pokemon from the API")
 
             except pypokedex.exceptions.PyPokedexHTTPError as e: #this is the error message that this api returns if it didnt find the pokemon it was looking for
-                Pokemon.title("MISSINGNO.")
+                self.title("MISSINGNO.")
                 image = PIL.Image.open("images\MissingNo.png")
                 resize_image = image.resize((200, 200))
                 missingno_img = PIL.ImageTk.PhotoImage(resize_image)
                 add_image_to_global_list(img)
 
-                my_canvas.itemconfig(pokemon_info, text="MISSINGNO.")
-                my_canvas.itemconfig(pokemon_image, image=missingno_img)
-                my_canvas.itemconfig(pokemon_type, text="???? - ????")
-                my_canvas.itemconfig(pokemon_height, text="Height: ????")
-                my_canvas.itemconfig(pokemon_weight, text="Weight: ????")
-                my_canvas.itemconfig(error_message, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
+                self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
+                self.my_canvas.itemconfig(self.pokemon_image, image=missingno_img)
+                self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
+                self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
+                self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
+                self.my_canvas.itemconfig(self.error_message, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
                 print(e)
 
             except Exception as e: #if an error occurred and who on earth knows what it was, just tell the user an error occurred
@@ -162,12 +176,12 @@ class dexEntry(Toplevel):
                 missingno_img = PIL.ImageTk.PhotoImage(resize_image)
                 add_image_to_global_list(img)
 
-                my_canvas.itemconfig(pokemon_info, text="MISSINGNO.")
-                my_canvas.itemconfig(pokemon_image, image=missingno_img)
-                my_canvas.itemconfig(pokemon_type, text="???? - ????")
-                my_canvas.itemconfig(pokemon_height, text="Height: ????")
-                my_canvas.itemconfig(pokemon_weight, text="Weight: ????")
-                my_canvas.itemconfig(error_message, text="An error occurred. Please Try Again.", font= ("Consolas", 10))
+                self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
+                self.my_canvas.itemconfig(self.pokemon_image, image=missingno_img)
+                self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
+                self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
+                self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
+                self.my_canvas.itemconfig(self.error_message, text="An error occurred. Please Try Again.", font= ("Consolas", 10))
                 print(e)
 
         load_pokemon(Pokemon_Entry)
