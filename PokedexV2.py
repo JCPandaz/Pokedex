@@ -53,6 +53,7 @@ class dexEntry(Toplevel):
 
         self.front_img = None
         self.back_img = None
+        self.missingno_img = None
 
         def add_image_to_global_list(image):
             global global_image_list
@@ -68,7 +69,6 @@ class dexEntry(Toplevel):
                 if response.status == 200:
                     image = PIL.Image.open(BytesIO(response.data))
                     resize_image = image.resize((200, 200))
-                    global  front_img
                     self.front_img = PIL.ImageTk.PhotoImage(resize_image)
                     add_image_to_global_list(self.front_img)
                     self.my_canvas.itemconfig(self.pokemon_image, image=self.front_img)
@@ -79,7 +79,6 @@ class dexEntry(Toplevel):
                         if response.status == 200:
                             image2 = PIL.Image.open(BytesIO(response.data))
                             resize_image2 = image2.resize((200, 200))
-                            global back_img
                             self.back_img = PIL.ImageTk.PhotoImage(resize_image2)
                             add_image_to_global_list(self.back_img)
                             response.release_conn()  # Release the connection
@@ -144,11 +143,11 @@ class dexEntry(Toplevel):
                     self.title("MISSINGNO.")
                     image = PIL.Image.open("images\MissingNo.png")
                     resize_image = image.resize((200, 200))
-                    missingno_img = PIL.ImageTk.PhotoImage(resize_image)
-                    add_image_to_global_list(img)
+                    self.missingno_img = PIL.ImageTk.PhotoImage(resize_image)
+                    add_image_to_global_list(self.missingno_img)
 
                     self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
-                    self.my_canvas.itemconfig(self.pokemon_image, image=missingno_img)
+                    self.my_canvas.itemconfig(self.pokemon_image, image=self.missingno_img)
                     self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
                     self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
                     self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
@@ -159,11 +158,11 @@ class dexEntry(Toplevel):
                 self.title("MISSINGNO.")
                 image = PIL.Image.open("images\MissingNo.png")
                 resize_image = image.resize((200, 200))
-                missingno_img = PIL.ImageTk.PhotoImage(resize_image)
-                add_image_to_global_list(img)
+                self.missingno_img = PIL.ImageTk.PhotoImage(resize_image)
+                add_image_to_global_list(self.missingno_img)
 
                 self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
-                self.my_canvas.itemconfig(self.pokemon_image, image=missingno_img)
+                self.my_canvas.itemconfig(self.pokemon_image, image=self.missingno_img)
                 self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
                 self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
                 self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
@@ -173,11 +172,11 @@ class dexEntry(Toplevel):
             except Exception as e: #if an error occurred and who on earth knows what it was, just tell the user an error occurred
                 image = PIL.Image.open("images\MissingNo.png")
                 resize_image = image.resize((200, 200))
-                missingno_img = PIL.ImageTk.PhotoImage(resize_image)
-                add_image_to_global_list(img)
+                self.missingno_img = PIL.ImageTk.PhotoImage(resize_image)
+                add_image_to_global_list(self.missingno_img)
 
                 self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
-                self.my_canvas.itemconfig(self.pokemon_image, image=missingno_img)
+                self.my_canvas.itemconfig(self.pokemon_image, image=self.missingno_img)
                 self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
                 self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
                 self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
