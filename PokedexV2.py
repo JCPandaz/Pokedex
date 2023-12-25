@@ -41,7 +41,7 @@ class dexEntry(Toplevel):
         
 
         #Pokemon Information
-        self.pokemon_info = self.my_canvas.create_text(375, 60, text=f" ", font=("Consolas", 12), fill= "black")
+        self.pokemon_info = self.my_canvas.create_text(380, 60, text=f" ", font=("Consolas", 12), fill= "black")
         self.pokemon_image = self.my_canvas.create_image(150,152)
         self.pokemon_type = self.my_canvas.create_text(375, 95, text=f" ", font=("Consolas", 12))
         self.pokemon_height = self.my_canvas.create_text(395, 185, text=f" ", font=("Consolas", 12), fill= "black")
@@ -50,6 +50,7 @@ class dexEntry(Toplevel):
         self.pokemon_basestats2 = self.my_canvas.create_text(256, 305, text=f" ", font=("Consolas", 14), fill= "black", width=500)
         self.pokemon_speed = self.my_canvas.create_text(256, 330, text=f" ", font=("Consolas", 14), fill= "black", width=400)
         self.error_message = self.my_canvas.create_text(256, 300, text=f" ", font=("Consolas", 12), fill= "red")
+        self.sprite_error = self.my_canvas.create_text(120,8, text=f" ", font=("Consolas", 10), fill = "red")
 
         self.front_img = None
         self.back_img = None
@@ -64,15 +65,16 @@ class dexEntry(Toplevel):
                 pokemon = pypokedex.get(name=Pokemon_Entry.get())
                 self.title(f"Pokedex Entry No.{pokemon.dex} - {pokemon.name}".title())
                 http = urllib3.PoolManager()
-                #get front sprite and display it
-                response = http.request('GET', pokemon.sprites.front.get('default'), preload_content=False)
-                if response.status == 200:
-                    image = PIL.Image.open(BytesIO(response.data))
-                    resize_image = image.resize((200, 200))
-                    self.front_img = PIL.ImageTk.PhotoImage(resize_image)
-                    add_image_to_global_list(self.front_img)
-                    self.my_canvas.itemconfig(self.pokemon_image, image=self.front_img)
-                    response.release_conn()  # Release the connection
+                #get front sprite (if there is one) and display it
+                if pokemon.sprites.front.get('default'):
+                    response = http.request('GET', pokemon.sprites.front.get('default'), preload_content=False)
+                    if response.status == 200:
+                        image = PIL.Image.open(BytesIO(response.data))
+                        resize_image = image.resize((200, 200))
+                        self.front_img = PIL.ImageTk.PhotoImage(resize_image)
+                        add_image_to_global_list(self.front_img)
+                        self.my_canvas.itemconfig(self.pokemon_image, image=self.front_img)
+                        response.release_conn()  # Release the connection
                 #get back sprite (if there is one) and implement turn sprite button
                     if pokemon.sprites.back.get('default'):
                         response = http.request('GET', pokemon.sprites.back.get('default'), preload_content=False)
@@ -83,7 +85,7 @@ class dexEntry(Toplevel):
                             add_image_to_global_list(self.back_img)
                             response.release_conn()  # Release the connection
 
-                            #function for turn sprite button
+                                #function for turn sprite button
                             def switchsprite():
                                 global direction
                                 if direction == "front":
@@ -94,65 +96,58 @@ class dexEntry(Toplevel):
                                     self.my_canvas.itemconfig(self.pokemon_image, image =self.front_img)
                                     direction = "front"
                                     return
-                            
-                            #turn sprite button
-                            sprite_btn = Button(self.my_canvas, text= "TURN SPRITE", font=("Consolas", 8), width = 15, command=switchsprite)
-                            back_sprite_btn_window = self.my_canvas.create_window(66,50, window=sprite_btn)
-
-                    #function for displaying the Pokemon Type(s)
-                    def Type_Colors():
-                        #changing pokemon.types list of strings so that it is just words                        
-                        poke_types = f"{pokemon.types}"
-                        modified_list = poke_types.strip("[]").replace("'","").replace(", "," - ")
-
-                        #18 pokemon types
-                        primary_types = ["grass","poison","water","fire","normal","psychic","electric","fighting","bug",
-                                         "fairy","dragon","ice","steel","rock","flying","ground","ghost","dark"]
-                        # Color palette for each Pokemon type
-                        color_palette = {"grass": "green","poison": "purple","water": "blue", "fire": "red", "normal": "gray","psychic": "violet red", "electric": "yellow",
-                                         "fighting": "brown4", "bug": "yellow green", "fairy": "light pink", "dragon": "goldenrod", "ice": "cyan", "steel": "dim gray",
-                                         "rock": "tan2", "flying": "Skyblue1", "ground": "sienna4", "ghost": "purple4", "dark": "midnight blue"}
-                        #nested for loop, checking the type or dual-type of the pokemon, and assigning the text a color from the color pallette
-                        for type1 in primary_types:
-                            for type2 in primary_types:
-                                if f"{type1}" == f"{modified_list}":
-                                    primary_color = color_palette.get(type1)
-                                    self.my_canvas.itemconfig(self.pokemon_type, fill=primary_color)
-                                    self.my_canvas.itemconfig(self.pokemon_type, text=" - ".join([t for t in pokemon.types]).title())
-                                    return
-                                if f"{type1} - {type2}" == f"{modified_list}":
-                                    primary_color = color_palette.get(type1)
-                                    secondary_color = color_palette.get(type2)
-                                    pokemon_type1 = self.my_canvas.create_text(330, 95, text=f" ", font=("Consolas", 12))
-                                    self.my_canvas.itemconfig(pokemon_type1, text=f"{type1}".title(), fill=primary_color)
-                                    pokemon_type2 = self.my_canvas.create_text(420, 95, text=f" ", font=("Consolas", 12))
-                                    self.my_canvas.itemconfig(pokemon_type2, text=f"{type2}".title(), fill=secondary_color)
-                                    return
-                    
                         
-                    #my_canvas.itemconfig(pokemon_image, image=front_img)
-                    self.my_canvas.itemconfig(self.pokemon_info, text=f"No.{pokemon.dex} - {pokemon.name}".title())
-                    Type_Colors()
-                    self.my_canvas.itemconfig(self.pokemon_height, text=f"Height: {pokemon.height}0 cm")
-                    self.my_canvas.itemconfig(self.pokemon_weight, text=f"Weight: {pokemon.weight}00 g")
-                    self.my_canvas.itemconfig(self.pokemon_basestats1, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense}")
-                    self.my_canvas.itemconfig(self.pokemon_basestats2, text=f"Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def}")
-                    self.my_canvas.itemconfig(self.pokemon_speed, text=f"Speed: {pokemon.base_stats.speed}")
+                        #turn sprite button
+                        sprite_btn = Button(self.my_canvas, text= "TURN SPRITE", font=("Consolas", 8), width = 15, command=switchsprite)
+                        back_sprite_btn_window = self.my_canvas.create_window(66,50, window=sprite_btn)
                 else: 
-                    # Handle unsuccessful response
-                    self.title("MISSINGNO.")
+                    # Handle unsuccessful response in sprite fetching
                     image = PIL.Image.open("images\MissingNo.png")
                     resize_image = image.resize((200, 200))
                     self.missingno_img = PIL.ImageTk.PhotoImage(resize_image)
                     add_image_to_global_list(self.missingno_img)
-
-                    self.my_canvas.itemconfig(self.pokemon_info, text="MISSINGNO.")
                     self.my_canvas.itemconfig(self.pokemon_image, image=self.missingno_img)
-                    self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
-                    self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
-                    self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
-                    self.my_canvas.itemconfig(self.error_message, text="Failed to fetch Pokemon from API.")
-                    print("Failed to fetch the load Pokemon from the API")
+                    self.my_canvas.itemconfig(self.sprite_error, text="Sprite does not exist in API.")
+                    print("No Pokemon sprite in API")    
+
+                #function for displaying the Pokemon Type(s)
+                def Type_Colors():
+                    #changing pokemon.types list of strings so that it is just words                        
+                    poke_types = f"{pokemon.types}"
+                    modified_list = poke_types.strip("[]").replace("'","").replace(", "," - ")
+
+                    #18 pokemon types
+                    primary_types = ["grass","poison","water","fire","normal","psychic","electric","fighting","bug",
+                                        "fairy","dragon","ice","steel","rock","flying","ground","ghost","dark"]
+                    # Color palette for each Pokemon type
+                    color_palette = {"grass": "green","poison": "purple","water": "blue", "fire": "red", "normal": "gray","psychic": "violet red", "electric": "yellow",
+                                        "fighting": "brown4", "bug": "yellow green", "fairy": "light pink", "dragon": "goldenrod", "ice": "cyan", "steel": "dim gray",
+                                        "rock": "tan2", "flying": "Skyblue1", "ground": "sienna4", "ghost": "purple4", "dark": "midnight blue"}
+                    #nested for loop, checking the type or dual-type of the pokemon, and assigning the text a color from the color pallette
+                    for type1 in primary_types:
+                        for type2 in primary_types:
+                            if f"{type1}" == f"{modified_list}":
+                                primary_color = color_palette.get(type1)
+                                self.my_canvas.itemconfig(self.pokemon_type, fill=primary_color)
+                                self.my_canvas.itemconfig(self.pokemon_type, text=" - ".join([t for t in pokemon.types]).title())
+                                return
+                            if f"{type1} - {type2}" == f"{modified_list}":
+                                primary_color = color_palette.get(type1)
+                                secondary_color = color_palette.get(type2)
+                                pokemon_type1 = self.my_canvas.create_text(330, 95, text=f" ", font=("Consolas", 12))
+                                self.my_canvas.itemconfig(pokemon_type1, text=f"{type1}".title(), fill=primary_color)
+                                pokemon_type2 = self.my_canvas.create_text(420, 95, text=f" ", font=("Consolas", 12))
+                                self.my_canvas.itemconfig(pokemon_type2, text=f"{type2}".title(), fill=secondary_color)
+                                return
+                        
+                self.my_canvas.itemconfig(self.pokemon_info, text=f"No.{pokemon.dex} - {pokemon.name}".title())
+                Type_Colors()
+                self.my_canvas.itemconfig(self.pokemon_height, text=f"Height: {pokemon.height}0 cm")
+                self.my_canvas.itemconfig(self.pokemon_weight, text=f"Weight: {pokemon.weight}00 g")
+                self.my_canvas.itemconfig(self.pokemon_basestats1, text=f"HP: {pokemon.base_stats.hp} - Attack: {pokemon.base_stats.attack} - Defense: {pokemon.base_stats.defense}")
+                self.my_canvas.itemconfig(self.pokemon_basestats2, text=f"Special Attack: {pokemon.base_stats.sp_atk} - Special Defense: {pokemon.base_stats.sp_def}")
+                self.my_canvas.itemconfig(self.pokemon_speed, text=f"Speed: {pokemon.base_stats.speed}")
+                
 
             except pypokedex.exceptions.PyPokedexHTTPError as e: #this is the error message that this api returns if it didnt find the pokemon it was looking for
                 self.title("MISSINGNO.")
@@ -166,7 +161,7 @@ class dexEntry(Toplevel):
                 self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
                 self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
                 self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
-                self.my_canvas.itemconfig(self.error_message, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
+                self.my_canvas.itemconfig(self.sprite_error, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
                 print(e)
 
             except Exception as e: #if an error occurred and who on earth knows what it was, just tell the user an error occurred
