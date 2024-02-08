@@ -161,7 +161,7 @@ class dexEntry(Toplevel):
                 self.my_canvas.itemconfig(self.pokemon_type, text="???? - ????")
                 self.my_canvas.itemconfig(self.pokemon_height, text="Height: ????")
                 self.my_canvas.itemconfig(self.pokemon_weight, text="Weight: ????")
-                self.my_canvas.itemconfig(self.sprite_error, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
+                self.my_canvas.itemconfig(self.error_message, text="The requested Pokemon was not found. Please try again.", font= ("Consolas", 10))
                 print(e)
 
             except Exception as e: #if an error occurred and who on earth knows what it was, just tell the user an error occurred
@@ -179,6 +179,7 @@ class dexEntry(Toplevel):
                 print(e)
 
         load_pokemon(Pokemon_Entry)
+
 
 #Home Screen
 Home = tk.Tk()
