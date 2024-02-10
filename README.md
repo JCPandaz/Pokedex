@@ -1,4 +1,4 @@
-# WOP personal learning project
+# WIP personal learning project
 trying to create the "Pokedex", a database containing the information of Pokemon. 
  
 # Future ideas
